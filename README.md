@@ -1,5 +1,5 @@
 # runANNgelina
-scripts to run the trained and tested RT emulator, ANNgelina
+scripts to run the trained and tested radiative transfer emulator, ANNgelina. Currently is optimized to be used on IllustrisTNG galaxies.
 
 To run ANNgelina on your data, make a .npy file containing your input features, with each row containing the input features for a galaxy and each column corresponding to a feature.
 
@@ -15,6 +15,6 @@ To run the NN:
 
 2) in your terminal, run $ python run.py
 
-Pull requests for modifications are welcome. 
-
 The script should output plotted SEDs in ./PlottedSEDs, as well as csv files containing the estimated SED values from the NN
+
+To read the methodology and analysis of ANNgelina, please refer to Sethuram, Cochrane, et al. (in prep)
