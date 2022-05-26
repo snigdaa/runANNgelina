@@ -17,4 +17,6 @@ To run the NN:
 
 The script should output plotted SEDs in ./PlottedSEDs, as well as csv files containing the estimated SED values from the NN
 
+Note: Pull requests for modification are welcome.
+
 To read the methodology and analysis of ANNgelina, please refer to Sethuram, Cochrane, et al. (in prep)
