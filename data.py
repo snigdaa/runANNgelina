@@ -9,7 +9,7 @@ class make_dataset():
     #mode: train, test, validate, or all -- test for running final model
     #seed: random seed to split training data; set explicitly to reproduce split, otherwise use randint
     #f_input: features
-    #f_input_norm: if multiple datasets are used, use f_input_norm to normalize; should have save shape as f_input
+    #f_input_norm: if multiple datasets are used, use f_input_norm to normalize; should have same shape & format as f_input
     #f_output: labels (SEDs)
     def __init__(self, mode, seed, f_input, f_input_norm, f_output):
         # read the value of the global properties; normalize them

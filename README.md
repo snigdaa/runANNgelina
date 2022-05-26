@@ -15,4 +15,6 @@ To run the NN:
 
 2) in your terminal, run $ python run.py
 
+Pull requests for modifications are welcome. 
+
 The script should output plotted SEDs in ./PlottedSEDs, as well as csv files containing the estimated SED values from the NN

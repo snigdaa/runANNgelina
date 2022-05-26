@@ -12,28 +12,28 @@ import matplotlib.pyplot as plt
 ################################### INPUT ############################################
 # data parameters - change as needed
 
-#input features you need: [0: Mstar (in M_sol); 1: Mdust (in M_sol); 2: Z* (in ?); 3: Z* <10Myr (in ?); 4: SFR (in M_sol / yr)]
-#specific wavelength array for output is listed in files -- interpolate your wavelengths to match size and numbers
+# input features you need: [0: Mstar (in M_sol); 1: Mdust (in M_sol); 2: Z* (in ?); 3: Z* <10Myr (in ?); 4: SFR (in M_sol / yr)]
+# specific wavelength array for output is available in ./data/wave_tng.dat
 
 f_features      = './data/tngFeatures.npy'          # path to your input features 
 f_features_norm = None                              # your normalization file, if you have one. Otherwise will normalize w/ feature file. Check data.py - make_dataset() to understand how this works
 
 #architecture parameters - do not touch
-mode            = 'all'                             # 'train','valid','test' or 'all' -- check data.py for what this means
-input_size  = 5     #dimensions of input data (number of features)
-numHL       = 1           #number of hidden layers in NN
-hidden      = [954]      #nodes in hl
-dr          = [0.20103]      #dropout rate
-batch_size  = 256    #batch size for training model
-epochs      = 1500   #num epochs for training model
-seed        = 2                                       # seed to shuffle data in train/valid/test; set to any value, remember it if you want to reproduce the shuffle. Will not affect 'all' but has to be included as a parameter for create_dataset anyways
-f_labels    = './data/tngFluxesOriginal.txt'          # existing SEDs - placeholder, do not modify
+mode        = 'all'                                 # 'train','valid','test' or 'all' -- check data.py for what this means
+input_size  = 5                                     # dimensions of input data (number of features)
+numHL       = 1                                     # number of hidden layers in NN
+hidden      = [954]                                 # # of nodes in hl
+dr          = [0.20103]                             # dropout rate
+batch_size  = 256                                   # batch size for training model
+epochs      = 1500                                  # num epochs for training model
+seed        = 2                                     # seed to shuffle data in train/valid/test; set to any value, remember it if you want to reproduce the shuffle. Will not affect 'all' but has to be included as a parameter for create_dataset anyways
+f_labels    = './data/tngFluxesOriginal.txt'        # existing SEDs - placeholder, do not modify
 
 # optuna & file parameters - do not touch
-fname       = 'tng_dynamicmodel2' #study name 
-output_size = 200           #this is the size of your wavelength array
+fname       = 'tng_dynamicmodel2'                   # model name
+output_size = 200                                   # size of wavelength array
 
-wavelengths_file = './data/wave_tng.dat' # file containing wavelength array to load into np array    
+wavelengths_file = './data/wave_tng.dat'            # file containing wavelength array to load into np array  
 ######################################################################################
 
 # use GPUs if available
@@ -44,13 +44,14 @@ else:
     print('CUDA Not Available')
     device = torch.device('cpu')
 
-fmodel = 'model/{}.pt'.format(fname) #make sure fmodel name matches the format for your model outputs
+# get neural network containing state_dict
+fmodel = 'model/{}.pt'.format(fname)          
 
 # generate the architecture
 model = architecture.dynamic_model2(input_size, output_size, numHL, hidden, dr)
 model.to(device)    
 
-# load best-model, if it exists
+# load fmodel
 if os.path.exists(fmodel):  
     print('Loading model...')
     model.load_state_dict(torch.load(fmodel, map_location=torch.device(device)))
@@ -66,24 +67,27 @@ test_loader = data.create_dataset(mode, seed, f_features, f_features_norm, f_lab
 # tell the model you are only using it, not training it
 model.eval()
 
-# these are global properties I wanted to print on my test plots, so I'm tracking them. Change as necessary for your model
-ogMS = []
-ogMD = []
-ogSFR = []
+# these are global properties I wanted to print on my test plots, so I'm tracking them
+ogMS    = []
+ogMD    = []
+ogSFR   = []
 
 # get wavelengths into logged and unlogged arrays
 wavelength_unlogged = np.genfromtxt(wavelengths_file, dtype=None,delimiter=' ')
-wavelength_logged = np.log10(np.array(wavelength_unlogged))
+wavelength_logged   = np.log10(np.array(wavelength_unlogged))
 
-# create directory to store test plots
+# create directory to store plots
 try:
     Path('./PlottedSEDs').mkdir(parents=False, exist_ok=False)
 except Exception as e:
     print(e)
 
-# for getting feature values
-#get normalization factors for fullycombinedFeatures.npy, since that is what's being normalized in data_loader here
-features  = np.load(f_features)
+
+# get normalization factors for features file, since that is what's being normalized in data_loader here
+if f_features_norm is None:
+    features  = np.load(f_features)
+else:
+    features  = np.load(f_features_norm)
 logfeat = np.log10(features[:, [0,1,2,3,4]])
 meanms = np.mean(logfeat[:,0])
 meanmd = np.mean(logfeat[:,1])
@@ -100,13 +104,13 @@ estimatedLoggedSEDs = []
 estimatedUnloggedSEDs = []
                
 with torch.no_grad():
-    # open test data; if larger than batch size, will iterate over x, y multiple times hence the counter
+    # open data; if larger than batch size, will iterate over x, y multiple times hence the counter
     for x, y in test_loader:
         bs      = x.shape[0]    # batch size
         x       = x.to(device)  # input features
         y_NN    = model(x)      # NN estimate
         
-        # iterate over each galaxy in set
+        # iterate over each galaxy in batch
         for i in range(0, len(x)):
             counter += 1
 
@@ -130,10 +134,10 @@ with torch.no_grad():
             denormed_ms = np.format_float_scientific(denormed_ms, precision=2)
             denormed_md = np.format_float_scientific(denormed_md, precision=2)
             
-            # set up test plot
+            # set up plot
             fig, axs = plt.subplots(2, figsize=(8,10))
             
-            # get model input and output into np arrays
+            # get model output into np array
             try:
                 nnestimate = model(x[i]).numpy()
 
@@ -145,7 +149,7 @@ with torch.no_grad():
             estimatedLoggedSEDs.append(nnestimate)
             estimatedUnloggedSEDs.append(unloggedestimate)
 
-            # plot true vs pred
+            # plot logged & unlogged SEDs
             axs[0].plot(wavelength_logged,nnestimate,'r-')
             props = dict(boxstyle='round', facecolor = 'mistyrose', alpha=0.4)
 
@@ -171,5 +175,6 @@ with torch.no_grad():
         print (np.shape(x))
         print (np.shape(y_NN))
 
+# save SEDs to csv
 np.savetxt('estimatedLoggedSEDs.csv', estimatedLoggedSEDs, delimiter = ',')
 np.savetxt('estimatedUnlogedSEDs.csv', estimatedUnloggedSEDs, delimiter = ',')
