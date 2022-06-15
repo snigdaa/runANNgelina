@@ -3,7 +3,7 @@ scripts to run the trained and tested radiative transfer emulator, ANNgelina. Cu
 
 To run ANNgelina on your data, make a .npy file containing your input features, with each row containing the input features for a galaxy and each column corresponding to a feature.
 
-Format for input features: [0: Mstar (in M_sol); 1: Mdust (in M_sol); 2: Z* (in ?); 3: Z* <10Myr (in ?); 4: SFR (in M_sol / yr)]
+Format for input features: [0: Mstar (in M_sol); 1: Mdust (in M_sol); 2: Z* (in metal mass / solar mass); 3: Z* <10Myr (in metal mass / solar mass); 4: SFR (in M_sol / yr)]
 
 You can tack on any other information about your file after these indices if you desire, but you will not be able to access them from test_loader unless you code them into data.py as input features. For a robust understanding of how the NN is reading in data, please look through the code & comments in data.py. 
 
