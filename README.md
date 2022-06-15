@@ -1,19 +1,21 @@
 # runANNgelina
-scripts to run the trained and tested radiative transfer emulator, ANNgelina. Currently is optimized to be used on IllustrisTNG galaxies.
+This repository contains scripts to run the trained and tested radiative transfer emulator, ANNgelina. Currently is optimized to be used on IllustrisTNG galaxies.
 
-To run ANNgelina on your data, make a .npy file containing your input features, with each row containing the input features for a galaxy and each column corresponding to a feature.
+### 1) make a .npy file containing your input features, with each row containing the input features for a galaxy and each column corresponding to a feature.
 
-Format for input features: [0: Mstar (in M_sol); 1: Mdust (in M_sol); 2: Z* (in metal mass / solar mass); 3: Z* <10Myr (in metal mass / solar mass); 4: SFR (in M_sol / yr)]
+NOTE - Format for input features, keep the same ordering: 
+> [**0: Mstar** (solar mass); **1: Mdust** (solar mass); **2: Z*** (metal mass / solar mass); **3: Z*** **<10Myr** (metal mass / solar mass); **4: SFR** (solar mass / yr)] 
 
 You can tack on any other information about your file after these indices if you desire, but you will not be able to access them from test_loader unless you code them into data.py as input features. For a robust understanding of how the NN is reading in data, please look through the code & comments in data.py. 
 
-Do not modify any variables except f_features (and f_features_norm, if you would like to normalize your data to some other standard than the existing feature set. Refer to data.py - make_dataset() to understand how normalization is done)
+### 2) Open run.py. ONLY modify f_features to point to your input features file
+And add pointer for f_features_norm, if you would like to normalize your data with some other standard deviation/mean of features than the input set. Refer to Methods in paper or function make_dataset() in data.py to understand in detail how normalization is done
 
-To run the NN:
+### 3) Open terminal
 
-1) Load necessary modules/packages
+### 4) Load necessary modules/packages
 
-2) in your terminal, run $ python run.py
+### 5) In terminal: $ python run.py
 
 The script should output plotted SEDs in ./PlottedSEDs, as well as csv files containing the estimated SED values from the NN
 
