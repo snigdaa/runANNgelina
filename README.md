@@ -23,6 +23,5 @@ And add pointer for `f_features_norm`, if you would like to normalize your data 
 
 The script should output plotted SEDs in `./PlottedSEDs`, as well as csv files containing the estimated SED values from the NN
 
-Note: Pull requests for modification are welcome. This code is being actively modified and updated, so if you run into bugs or issues please be patient or contribute to the solution!
+Note: Pull requests for modification are welcome. 
 
-To read the methodology and analysis of ANNgelina, please refer to Sethuram, Cochrane, et al. (in prep)
