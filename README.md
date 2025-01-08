@@ -1,5 +1,7 @@
 # runANNgelina
-This repository contains scripts to run the trained and tested radiative transfer emulator, ANNgelina. Currently is optimized to be used on IllustrisTNG galaxies.
+This repository contains scripts to run the trained and tested radiative transfer emulator, ANNgelina. Currently is optimized to be used on IllustrisTNG galaxies. 
+
+Paper: [Emulating Radiative Transfer](https://arxiv.org/abs/2308.13648)
 
 ### 1) make a `.npy` file containing your input features, with each row containing the input features for a galaxy and each column corresponding to a feature.
 
